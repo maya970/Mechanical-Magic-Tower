@@ -20,5 +20,19 @@ var MotaConfig = {
     blue: 15,
     red: 25,
     reset: 80
+  },
+  /** 非暂停累计运行超过此时长（毫秒）记为失败；暂停不计入 */
+  RUN_LIMIT_UNPAUSED_MS: 60000,
+  /** 加权 Dijkstra 边权：数值越大路径越倾向绕行 */
+  DEFAULT_NAV_WEIGHTS: {
+    floor: 1,
+    monster: 4,
+    boss: 14,
+    door: 5,
+    gold: 1.2,
+    key: 1.2,
+    stairs: 1,
+    conveyor: 2.5,
+    portal: 1.2
   }
 };

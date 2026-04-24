@@ -48,6 +48,8 @@ function createGameState() {
     doorInteractCooldown: 0,
     toggleGates: [],
     navAlgorithm: "astar",
+    navWeights: JSON.parse(JSON.stringify(MotaConfig.DEFAULT_NAV_WEIGHTS)),
+    runTimeActiveMs: 0,
     paused: false,
     timeScale: 1,
     simAccumulator: 0,

@@ -10,9 +10,27 @@ function setup() {
     window.GameState = createGameState();
     var gs = window.GameState;
 
+    MotaI18n.initFromStorage();
+
     try {
       var hf = localStorage.getItem("highestFloor");
       if (hf) gs.highestFloor = parseInt(hf, 10) || 1;
+      var nw = localStorage.getItem("navWeights_v1");
+      if (nw) {
+        var parsed = JSON.parse(nw);
+        var k;
+        for (k in parsed) {
+          if (
+            Object.prototype.hasOwnProperty.call(parsed, k) &&
+            gs.navWeights &&
+            typeof gs.navWeights[k] === "number" &&
+            typeof parsed[k] === "number" &&
+            parsed[k] > 0
+          ) {
+            gs.navWeights[k] = parsed[k];
+          }
+        }
+      }
     } catch (e0) {}
     if (typeof MotaShopPricing !== "undefined") {
       MotaShopPricing.loadInto(gs);
@@ -34,6 +52,9 @@ function setup() {
 
     MotaUI.bindControls(gs);
     MotaUI.bindAutoPanel(gs);
+    MotaUI.bindLangToggle(gs);
+    MotaUI.bindLegendTooltip();
+    MotaUI.bindNavWeights(gs);
     MotaUI.bindExit(gs);
     MotaUI.bindSideShop(gs);
 
@@ -43,8 +64,8 @@ function setup() {
     MotaGame.rebuildMonstersFromMaze(gs);
     gs.lastSimMillis = millis();
     gs.simAccumulator = 0;
-    MotaUI.updateStatus(gs);
-    MotaUI.updateLegend();
+    MotaUI.refreshUiLang(gs);
+    MotaUI.syncWeightInputsFromGs(gs);
     MotaUI.refreshSideShop(gs);
 
     var err = document.getElementById("load-err");
@@ -80,8 +101,14 @@ function draw() {
   if (!gs.lastSimMillis) gs.lastSimMillis = now;
   var dt = now - gs.lastSimMillis;
   gs.lastSimMillis = now;
+  if (dt > 250) dt = 250;
 
   if (!gs.paused) {
+    gs.runTimeActiveMs = (gs.runTimeActiveMs | 0) + dt;
+    if (gs.runTimeActiveMs >= MotaConfig.RUN_LIMIT_UNPAUSED_MS) {
+      MotaUI.failByTimeout(gs);
+      return;
+    }
     gs.simAccumulator += dt * (gs.timeScale || 1);
     while (gs.simAccumulator >= SIM_STEP_MS) {
       gs.simAccumulator -= SIM_STEP_MS;
@@ -98,6 +125,7 @@ function draw() {
   MotaGame.updatePlayerPhysics(gs, width, height);
 
   MotaRender.drawWorld(gs);
+  MotaUI.updateStatus(gs);
 }
 
 function windowResized() {
@@ -152,8 +180,7 @@ function keyPressed() {
   if (!gs || gs.gameOver) return;
   if (keyCode === 32) {
     gs.paused = !gs.paused;
-    var pauseBtn = document.getElementById("btn-pause");
-    if (pauseBtn) pauseBtn.textContent = gs.paused ? "继续" : "暂停";
+    MotaUI.updatePauseButtonText(gs);
     MotaUI.updateStatus(gs);
   }
 }

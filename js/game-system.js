@@ -168,6 +168,7 @@ var MotaGame = (function () {
       var totalDmg = (turns - 1) * dmgToPlayer;
       if (pl.hp <= totalDmg) {
         gs.gameOver = true;
+        MotaUI.persistHighest(gs);
         MotaUI.showAlert("你被BOSS打败了！最高楼层：" + gs.highestFloor);
         setTimeout(function () {
           window.location.reload();
@@ -195,6 +196,7 @@ var MotaGame = (function () {
     var totalDmg2 = (turns2 - 1) * dmgP;
     if (pl.hp <= totalDmg2) {
       gs.gameOver = true;
+      MotaUI.persistHighest(gs);
       MotaUI.showAlert("你被怪物打败了！最高楼层：" + gs.highestFloor);
       setTimeout(function () {
         window.location.reload();

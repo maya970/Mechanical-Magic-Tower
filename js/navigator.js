@@ -1,5 +1,5 @@
 /**
- * 寻路：BFS / Dijkstra / A* / 洪水(从楼梯反向 BFS 距离场) / 贪心
+ * 寻路：BFS / Dijkstra / A* / 加权 Dijkstra / 洪水 / 贪心 / 随机
  */
 var MotaNav = (function () {
   var R = MotaRng;
@@ -85,7 +85,31 @@ var MotaNav = (function () {
     return null;
   }
 
-  function dijkstraOrAstar(gs, sx, sy, goal, useHeuristic) {
+  function defaultEdgeCost(gs2, nx2, ny2) {
+    var t = gs2.maze[ny2][nx2];
+    var w = 1;
+    if (t.type === "monster" || t.type === "boss") w += 0.5;
+    if (t.type === "conveyor") w += 0.2;
+    if (t.type === "portal") w += 0.05;
+    return w;
+  }
+
+  function weightedEdgeCost(gs2, nx2, ny2) {
+    var t = gs2.maze[ny2][nx2];
+    var nw = gs2.navWeights || MotaConfig.DEFAULT_NAV_WEIGHTS;
+    if (t.type === "boss") return nw.boss;
+    if (t.type === "monster") return nw.monster;
+    if (t.type === "door") return nw.door;
+    if (t.type === "conveyor") return nw.conveyor;
+    if (t.type === "portal") return nw.portal;
+    if (t.type === "stairs") return nw.stairs;
+    if (t.type === "gold") return nw.gold;
+    if (t.type === "key") return nw.key;
+    return nw.floor;
+  }
+
+  function dijkstraOrAstar(gs, sx, sy, goal, useHeuristic, edgeCostFn) {
+    var edgeCost = edgeCostFn || defaultEdgeCost;
     var G = gs.GRID_SIZE;
     var dist = [];
     var y, x;
@@ -99,15 +123,6 @@ var MotaNav = (function () {
 
     function h(xx, yy) {
       return R.abs(xx - goal.x) + R.abs(yy - goal.y);
-    }
-
-    function edgeCost(gs2, nx2, ny2) {
-      var t = gs2.maze[ny2][nx2];
-      var w = 1;
-      if (t.type === "monster" || t.type === "boss") w += 0.5;
-      if (t.type === "conveyor") w += 0.2;
-      if (t.type === "portal") w += 0.05;
-      return w;
     }
 
     while (pq.length > 0) {
@@ -231,6 +246,14 @@ var MotaNav = (function () {
       return best;
     }
 
+    if (algo === "random") {
+      var nbr = neighbors(gs, sx, sy);
+      if (nbr.length === 0) return null;
+      var pick = nbr[R.floor(R.rnd() * nbr.length)];
+      gs.navPath = [];
+      return { dx: pick.dx, dy: pick.dy };
+    }
+
     if (algo === "flood") {
       var field = floodDistanceField(gs);
       if (field) {
@@ -242,9 +265,11 @@ var MotaNav = (function () {
       }
       path = bfsPath(gs, sx, sy, goal);
     } else if (algo === "dijkstra") {
-      path = dijkstraOrAstar(gs, sx, sy, goal, false);
+      path = dijkstraOrAstar(gs, sx, sy, goal, false, null);
     } else if (algo === "astar") {
-      path = dijkstraOrAstar(gs, sx, sy, goal, true);
+      path = dijkstraOrAstar(gs, sx, sy, goal, true, null);
+    } else if (algo === "weighted") {
+      path = dijkstraOrAstar(gs, sx, sy, goal, false, weightedEdgeCost);
     } else {
       path = bfsPath(gs, sx, sy, goal);
     }

@@ -49,27 +49,28 @@
 
   <div id="status"></div>
   <div id="legend"></div>
-  <div id="hint">自动寻路到楼梯上楼 · 空格=暂停/继续 · 传送带/传送门/开关墙见图例 · 右侧栏随时购物 · 点击怪看属性</div>
+  <div id="legend-tooltip" class="legend-tooltip" hidden></div>
+  <div id="hint"></div>
   <div id="monster-info"></div>
   <div id="alert-box"></div>
 
   <div id="game-shell">
     <div id="main-wrap"></div>
     <aside id="side-shop" aria-label="侧栏商店">
-      <div class="side-shop-title">商店</div>
-      <p class="side-shop-note">三条价格曲线各自累计；随时可点购买。</p>
+      <div class="side-shop-title" id="side-shop-title">商店</div>
+      <p class="side-shop-note" id="side-shop-note">三条价格曲线各自累计；随时可点购买。</p>
       <section class="shop-curve-block">
-        <div class="shop-curve-head">甲·生命系（指数）　已购 <span id="cv-life-n">0</span></div>
+        <div class="shop-curve-head"><span id="cv-life-title"></span> <span id="cv-life-n">0</span></div>
         <button type="button" class="shop-btn" data-shop="hp">生命 +200　<span id="shop-hp">—</span> 金</button>
         <button type="button" class="shop-btn" data-shop="reset">重置本层　<span id="shop-reset">—</span> 金</button>
       </section>
       <section class="shop-curve-block">
-        <div class="shop-curve-head">乙·强袭系（二次）　已购 <span id="cv-strike-n">0</span></div>
+        <div class="shop-curve-head"><span id="cv-strike-title"></span> <span id="cv-strike-n">0</span></div>
         <button type="button" class="shop-btn" data-shop="atk">攻击 +8　<span id="shop-atk">—</span> 金</button>
         <button type="button" class="shop-btn" data-shop="yellow">黄钥匙 +1　<span id="shop-yellow">—</span> 金</button>
       </section>
       <section class="shop-curve-block">
-        <div class="shop-curve-head">丙·守御系（线性+对数）　已购 <span id="cv-bulwark-n">0</span></div>
+        <div class="shop-curve-head"><span id="cv-bulwark-title"></span> <span id="cv-bulwark-n">0</span></div>
         <button type="button" class="shop-btn" data-shop="def">防御 +8　<span id="shop-def">—</span> 金</button>
         <button type="button" class="shop-btn" data-shop="blue">蓝钥匙 +1　<span id="shop-blue">—</span> 金</button>
         <button type="button" class="shop-btn" data-shop="red">红钥匙 +1　<span id="shop-red">—</span> 金</button>
@@ -78,23 +79,42 @@
   </div>
 
   <div id="auto-panel">
-    <button type="button" class="auto-btn" id="btn-pause">暂停</button>
-    <label class="auto-lab">倍速
-      <select id="nav-speed">
-        <option value="1">1×</option>
-        <option value="2">2×</option>
-        <option value="4">4×</option>
-      </select>
-    </label>
-    <label class="auto-lab">算法
-      <select id="nav-algo">
-        <option value="bfs">BFS</option>
-        <option value="dijkstra">Dijkstra</option>
-        <option value="astar" selected>A*</option>
-        <option value="flood">洪水/势能</option>
-        <option value="greedy">贪心</option>
-      </select>
-    </label>
+    <div class="auto-row">
+      <button type="button" class="auto-btn" id="btn-pause">暂停</button>
+      <button type="button" class="auto-btn" id="btn-lang">EN</button>
+      <label class="auto-lab">倍速
+        <select id="nav-speed">
+          <option value="1">1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+      </label>
+      <label class="auto-lab">算法
+        <select id="nav-algo">
+          <option value="bfs">BFS</option>
+          <option value="dijkstra">Dijkstra</option>
+          <option value="astar" selected>A*</option>
+          <option value="flood">洪水/势能</option>
+          <option value="greedy">贪心</option>
+          <option value="random">随机</option>
+          <option value="weighted">加权 Dijkstra</option>
+        </select>
+      </label>
+    </div>
+    <div id="nav-weight-panel" class="nav-weight-panel" hidden>
+      <div id="nw-panel-title" class="nw-panel-title"></div>
+      <div class="nw-grid">
+        <label class="nw-item"><span id="nw-lb-floor"></span> <input type="number" id="nw-floor" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-monster"></span> <input type="number" id="nw-monster" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-boss"></span> <input type="number" id="nw-boss" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-door"></span> <input type="number" id="nw-door" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-gold"></span> <input type="number" id="nw-gold" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-key"></span> <input type="number" id="nw-key" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-stairs"></span> <input type="number" id="nw-stairs" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-conveyor"></span> <input type="number" id="nw-conveyor" min="0.1" max="99" step="0.1" /></label>
+        <label class="nw-item"><span id="nw-lb-portal"></span> <input type="number" id="nw-portal" min="0.1" max="99" step="0.1" /></label>
+      </div>
+    </div>
   </div>
   <div id="exit-btn">退出冒险</div>
   <script src="js/config.js"></script>
@@ -107,6 +127,7 @@
   <script src="js/grid-move.js"></script>
   <script src="js/navigator.js"></script>
   <script src="js/shop-pricing.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/ui.js"></script>
 
   <!-- 同目录本地 p5，避免 file:// 或 CDN 跨域导致 “Script error.” 无详情 -->
