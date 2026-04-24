@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>魔塔跑酷</title>
+  <link rel="stylesheet" href="css/game.css">
+  <script>
+    function showBootError(title, detail) {
+      var el = document.getElementById("load-err");
+      if (!el) return;
+      el.style.display = "flex";
+      el.innerHTML =
+        "<div><strong>" +
+        title +
+        "</strong><br>" +
+        (detail || "") +
+        "<br><small>请用 Chrome/Edge 打开与本文件同目录下的 <strong>index.html</strong>；若仍异常，按 F12 查看控制台。</small></div>";
+    }
+    window.onerror = function (msg, url, line, col, err) {
+      var detail =
+        String(msg) +
+        "<br><code>" +
+        (url || "(未知文件)") +
+        ":" +
+        line +
+        "</code>";
+      if (msg === "Script error." || msg === "Script error") {
+        detail +=
+          "<br>（浏览器对跨域脚本隐藏了具体原因；本项目已优先使用本地 <code>vendor/p5.min.js</code>。请打开开发者工具 Console 查看红色报错。）";
+      }
+      if (err && err.stack) {
+        detail += "<pre style=\"text-align:left;font-size:11px;overflow:auto;max-height:40vh;\">" +
+          String(err.stack).replace(/</g, "&lt;") +
+          "</pre>";
+      }
+      showBootError("页面出错", detail);
+      return false;
+    };
+    window.addEventListener("unhandledrejection", function (ev) {
+      var r = ev.reason;
+      var msg = r && r.message ? r.message : String(r);
+      showBootError("未处理的 Promise 错误", msg);
+    });
+  </script>
+</head>
+<body>
+  <div id="load-err"></div>
+
+  <div id="status"></div>
+  <div id="legend"></div>
+  <div id="hint">自动寻路到楼梯上楼 · 空格=暂停/继续 · 传送带/传送门/开关墙见图例 · 右侧栏随时购物 · 点击怪看属性</div>
+  <div id="monster-info"></div>
+  <div id="alert-box"></div>
+
+  <div id="game-shell">
+    <div id="main-wrap"></div>
+    <aside id="side-shop" aria-label="侧栏商店">
+      <div class="side-shop-title">商店</div>
+      <p class="side-shop-note">三条价格曲线各自累计；随时可点购买。</p>
+      <section class="shop-curve-block">
+        <div class="shop-curve-head">甲·生命系（指数）　已购 <span id="cv-life-n">0</span></div>
+        <button type="button" class="shop-btn" data-shop="hp">生命 +200　<span id="shop-hp">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="reset">重置本层　<span id="shop-reset">—</span> 金</button>
+      </section>
+      <section class="shop-curve-block">
+        <div class="shop-curve-head">乙·强袭系（二次）　已购 <span id="cv-strike-n">0</span></div>
+        <button type="button" class="shop-btn" data-shop="atk">攻击 +8　<span id="shop-atk">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="yellow">黄钥匙 +1　<span id="shop-yellow">—</span> 金</button>
+      </section>
+      <section class="shop-curve-block">
+        <div class="shop-curve-head">丙·守御系（线性+对数）　已购 <span id="cv-bulwark-n">0</span></div>
+        <button type="button" class="shop-btn" data-shop="def">防御 +8　<span id="shop-def">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="blue">蓝钥匙 +1　<span id="shop-blue">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="red">红钥匙 +1　<span id="shop-red">—</span> 金</button>
+      </section>
+    </aside>
+  </div>
+
+  <div id="auto-panel">
+    <button type="button" class="auto-btn" id="btn-pause">暂停</button>
+    <label class="auto-lab">倍速
+      <select id="nav-speed">
+        <option value="1">1×</option>
+        <option value="2">2×</option>
+        <option value="4">4×</option>
+      </select>
+    </label>
+    <label class="auto-lab">算法
+      <select id="nav-algo">
+        <option value="bfs">BFS</option>
+        <option value="dijkstra">Dijkstra</option>
+        <option value="astar" selected>A*</option>
+        <option value="flood">洪水/势能</option>
+        <option value="greedy">贪心</option>
+      </select>
+    </label>
+  </div>
+  <div id="exit-btn">退出冒险</div>
+  <script src="js/config.js"></script>
+  <script src="js/rng.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/maze-gen.js"></script>
+  <script src="js/wall-helpers.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/game-system.js"></script>
+  <script src="js/grid-move.js"></script>
+  <script src="js/navigator.js"></script>
+  <script src="js/shop-pricing.js"></script>
+  <script src="js/ui.js"></script>
+
+  <!-- 同目录本地 p5，避免 file:// 或 CDN 跨域导致 “Script error.” 无详情 -->
+  <script src="vendor/p5.min.js"></script>
+  <script>
+    (function () {
+      function showP5Fail() {
+        var el = document.getElementById("load-err");
+        if (el) {
+          el.style.display = "flex";
+          el.innerHTML =
+            "<div><strong>无法加载 p5.js</strong><br>请确认存在文件 <code>vendor/p5.min.js</code>（与本页同级目录 vendor）。<br>或联网后把下面脚本地址改为 CDN。</div>";
+        }
+      }
+
+      function loadGameScripts() {
+        var a = document.createElement("script");
+        a.src = "js/render.js";
+        a.onload = function () {
+          var b = document.createElement("script");
+          b.src = "js/main.js";
+          b.onerror = function () {
+            showBootError("脚本加载失败", "无法加载 js/main.js，请检查文件是否在 js 目录下。");
+          };
+          document.body.appendChild(b);
+        };
+        a.onerror = function () {
+          showBootError("脚本加载失败", "无法加载 js/render.js，请检查文件是否在 js 目录下。");
+        };
+        document.body.appendChild(a);
+      }
+
+      if (typeof createCanvas === "function") {
+        loadGameScripts();
+      } else {
+        var s = document.createElement("script");
+        s.src = "https://unpkg.com/p5@1.4.2/lib/p5.min.js";
+        s.onload = loadGameScripts;
+        s.onerror = showP5Fail;
+        document.head.appendChild(s);
+      }
+    })();
+  </script>
+</body>
+</html>
