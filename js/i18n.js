@@ -10,6 +10,7 @@ var MotaI18n = (function () {
     lang_btn_en: { zh: "EN", en: "EN" },
     legend_title: { zh: "图例（悬停看说明）", en: "Legend (hover for tips)" },
     leg_player: { zh: "你", en: "You" },
+    leg_floor: { zh: "空地", en: "Floor" },
     leg_monster: { zh: "怪", en: "Monster" },
     leg_boss: { zh: "BOSS", en: "BOSS" },
     leg_door: { zh: "门", en: "Door" },
@@ -75,7 +76,7 @@ var MotaI18n = (function () {
     algo_bfs: { zh: "BFS", en: "BFS" },
     algo_dijkstra: { zh: "Dijkstra", en: "Dijkstra" },
     algo_astar: { zh: "A*", en: "A*" },
-    algo_flood: { zh: "洪水", en: "Flood" },
+    algo_flood: { zh: "洪水/势能", en: "Flood / potential" },
     algo_greedy: { zh: "贪心", en: "Greedy" },
     algo_random: { zh: "随机", en: "Random" },
     algo_weighted: { zh: "加权 Dijkstra", en: "Weighted Dijkstra" },
@@ -124,7 +125,96 @@ var MotaI18n = (function () {
     gold_short: { zh: "金币不足！需要 ", en: "Not enough gold! Need " },
     gold_short2: { zh: " 金币，当前有 ", en: " gold, you have " },
     gold_short3: { zh: " 金币。", en: "." },
-    buy_fail: { zh: "无法完成购买。", en: "Purchase failed." }
+    buy_fail: { zh: "无法完成购买。", en: "Purchase failed." },
+    page_title: { zh: "魔塔跑酷", en: "Magic Tower Run" },
+    lab_speed: { zh: "倍速", en: "Speed" },
+    lab_algo: { zh: "算法", en: "Algorithm" },
+    exit_btn: { zh: "退出冒险", en: "Exit" },
+    cell_pos: { zh: "坐标 ({x},{y})", en: "Tile ({x},{y})" },
+    cell_title_floor: { zh: "空地 / 平台", en: "Floor / platform" },
+    cell_title_stairs: { zh: "上楼楼梯", en: "Stairs (up)" },
+    cell_title_door: { zh: "门", en: "Door" },
+    cell_title_key: { zh: "钥匙", en: "Key" },
+    cell_title_gold: { zh: "金币堆", en: "Gold pile" },
+    cell_title_conveyor: { zh: "传送带", en: "Conveyor" },
+    cell_title_portal: { zh: "传送门", en: "Portal" },
+    cell_title_monster: { zh: "怪物", en: "Monster" },
+    cell_title_boss: { zh: "BOSS", en: "BOSS" },
+    cell_title_unknown: { zh: "格子", en: "Tile" },
+    cell_floor_desc: {
+      zh: "可走地面；墙上的实线不可穿越。橙边为周期开关墙（随步数开闭）。",
+      en: "Walkable ground; solid wall edges block you. Orange edges are timed toggle walls."
+    },
+    cell_platforms_n: { zh: "本格含 {n} 处平台落脚点。", en: "This tile has {n} platform segment(s)." },
+    cell_stairs_desc: {
+      zh: "站入格内可上楼；BOSS 层需先击败 BOSS 并通过后门。",
+      en: "Stand on tile to go up; on BOSS floors defeat the boss and pass the door first."
+    },
+    cell_door_desc: {
+      zh: "需要一把{color}钥匙才能通过；经过时消耗。",
+      en: "Needs one {color} key to pass; consumed when you step through."
+    },
+    cell_door_bosslock: {
+      zh: "此门在击败 BOSS 前无法打开。",
+      en: "Locked until the BOSS is defeated."
+    },
+    cell_key_desc: {
+      zh: "拾取获得一把{color}钥匙。",
+      en: "Pick up to gain one {color} key."
+    },
+    cell_gold_desc: {
+      zh: "拾取获得 {n} 金币。",
+      en: "Pick up for {n} gold."
+    },
+    cell_conv_fixed: {
+      zh: "进入后再沿方向 ({dx},{dy}) 滑动一格。",
+      en: "After entering, slides one tile in direction ({dx},{dy})."
+    },
+    cell_conv_random: {
+      zh: "进入后在可走的相邻格中随机再移动一格。",
+      en: "After entering, randomly slides to a random walkable neighbor."
+    },
+    cell_portal_desc: {
+      zh: "与 ({x},{y}) 处的传送门成对，进入即传送。",
+      en: "Paired with portal at ({x},{y}); entering teleports you."
+    },
+    cell_portal_nopair: { zh: "未配对目标。", en: "No linked target." },
+    cell_monster_intro: {
+      zh: "格上战斗：需攻击高于防御才能造成伤害。",
+      en: "Combat on tile: ATK must exceed DEF to deal damage."
+    },
+    cell_boss_intro: {
+      zh: "楼层 BOSS：击败后门才会解锁。",
+      en: "Floor BOSS: door unlocks after defeat."
+    },
+    cell_stat_hp: { zh: "生命", en: "HP" },
+    cell_stat_atk: { zh: "攻击", en: "ATK" },
+    cell_stat_def: { zh: "防御", en: "DEF" },
+    cell_stat_gold: { zh: "掉落金币", en: "Gold drop" },
+    keycolor_yellow: { zh: "黄色", en: "yellow" },
+    keycolor_blue: { zh: "蓝色", en: "blue" },
+    keycolor_red: { zh: "红色", en: "red" },
+    shop_lbl_hp: { zh: "生命 +200", en: "HP +200" },
+    shop_lbl_reset: { zh: "重置本层", en: "Reset floor" },
+    shop_lbl_atk: { zh: "攻击 +8", en: "ATK +8" },
+    shop_lbl_yellow: { zh: "黄钥匙 +1", en: "Yellow key +1" },
+    shop_lbl_def: { zh: "防御 +8", en: "DEF +8" },
+    shop_lbl_blue: { zh: "蓝钥匙 +1", en: "Blue key +1" },
+    shop_lbl_red: { zh: "红钥匙 +1", en: "Red key +1" },
+    shop_price_mid: { zh: "　", en: " " },
+    shop_unit_gold: { zh: " 金", en: " G" },
+    msg_door_boss_first: { zh: "必须先击败BOSS才能开启此门！", en: "Defeat the BOSS before this door opens!" },
+    msg_need_key: { zh: "需要一把{color}钥匙！", en: "Need a {color} key!" },
+    msg_boss_stairs: { zh: "必须先击败BOSS才能上楼！", en: "Defeat the BOSS before using stairs!" },
+    msg_boss_door_stairs: { zh: "必须先通过BOSS后的门才能上楼！", en: "Pass the post-BOSS door before stairs!" },
+    msg_cant_damage_boss: { zh: "你的攻击无法伤害BOSS！", en: "Your ATK cannot hurt this BOSS!" },
+    msg_cant_damage_mon: { zh: "你的攻击无法伤害怪物！", en: "Your ATK cannot hurt this monster!" },
+    msg_die_boss: { zh: "你被BOSS打败了！最高楼层：", en: "Defeated by BOSS! Best floor: " },
+    msg_die_mon: { zh: "你被怪物打败了！最高楼层：", en: "Defeated by monster! Best floor: " },
+    tip_floor: {
+      zh: "空地：可走；黑线为墙。可能有平台落脚点。",
+      en: "Floor: walkable; black lines are walls. May include small platforms."
+    }
   };
 
   function loadStored() {

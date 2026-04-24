@@ -51,7 +51,7 @@
   <div id="legend"></div>
   <div id="legend-tooltip" class="legend-tooltip" hidden></div>
   <div id="hint"></div>
-  <div id="monster-info"></div>
+  <div id="cell-info" role="status" aria-live="polite"></div>
   <div id="alert-box"></div>
 
   <div id="game-shell">
@@ -61,19 +61,19 @@
       <p class="side-shop-note" id="side-shop-note">三条价格曲线各自累计；随时可点购买。</p>
       <section class="shop-curve-block">
         <div class="shop-curve-head"><span id="cv-life-title"></span> <span id="cv-life-n">0</span></div>
-        <button type="button" class="shop-btn" data-shop="hp">生命 +200　<span id="shop-hp">—</span> 金</button>
-        <button type="button" class="shop-btn" data-shop="reset">重置本层　<span id="shop-reset">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="hp"><span id="shop-lb-hp-l"></span><span id="shop-hp">—</span><span id="shop-lb-hp-r"></span></button>
+        <button type="button" class="shop-btn" data-shop="reset"><span id="shop-lb-reset-l"></span><span id="shop-reset">—</span><span id="shop-lb-reset-r"></span></button>
       </section>
       <section class="shop-curve-block">
         <div class="shop-curve-head"><span id="cv-strike-title"></span> <span id="cv-strike-n">0</span></div>
-        <button type="button" class="shop-btn" data-shop="atk">攻击 +8　<span id="shop-atk">—</span> 金</button>
-        <button type="button" class="shop-btn" data-shop="yellow">黄钥匙 +1　<span id="shop-yellow">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="atk"><span id="shop-lb-atk-l"></span><span id="shop-atk">—</span><span id="shop-lb-atk-r"></span></button>
+        <button type="button" class="shop-btn" data-shop="yellow"><span id="shop-lb-yellow-l"></span><span id="shop-yellow">—</span><span id="shop-lb-yellow-r"></span></button>
       </section>
       <section class="shop-curve-block">
         <div class="shop-curve-head"><span id="cv-bulwark-title"></span> <span id="cv-bulwark-n">0</span></div>
-        <button type="button" class="shop-btn" data-shop="def">防御 +8　<span id="shop-def">—</span> 金</button>
-        <button type="button" class="shop-btn" data-shop="blue">蓝钥匙 +1　<span id="shop-blue">—</span> 金</button>
-        <button type="button" class="shop-btn" data-shop="red">红钥匙 +1　<span id="shop-red">—</span> 金</button>
+        <button type="button" class="shop-btn" data-shop="def"><span id="shop-lb-def-l"></span><span id="shop-def">—</span><span id="shop-lb-def-r"></span></button>
+        <button type="button" class="shop-btn" data-shop="blue"><span id="shop-lb-blue-l"></span><span id="shop-blue">—</span><span id="shop-lb-blue-r"></span></button>
+        <button type="button" class="shop-btn" data-shop="red"><span id="shop-lb-red-l"></span><span id="shop-red">—</span><span id="shop-lb-red-r"></span></button>
       </section>
     </aside>
   </div>
@@ -82,14 +82,14 @@
     <div class="auto-row">
       <button type="button" class="auto-btn" id="btn-pause">暂停</button>
       <button type="button" class="auto-btn" id="btn-lang">EN</button>
-      <label class="auto-lab">倍速
+      <label class="auto-lab"><span id="lab-speed"></span>
         <select id="nav-speed">
           <option value="1">1×</option>
           <option value="2">2×</option>
           <option value="4">4×</option>
         </select>
       </label>
-      <label class="auto-lab">算法
+      <label class="auto-lab"><span id="lab-algo"></span>
         <select id="nav-algo">
           <option value="bfs">BFS</option>
           <option value="dijkstra">Dijkstra</option>
@@ -116,7 +116,7 @@
       </div>
     </div>
   </div>
-  <div id="exit-btn">退出冒险</div>
+  <div id="exit-btn"></div>
   <script src="js/config.js"></script>
   <script src="js/rng.js"></script>
   <script src="js/state.js"></script>

@@ -148,6 +148,7 @@ var MotaUI = (function () {
       ti +
       "</div>" +
       row("#8f8", "player", "leg_player") +
+      row("#777", "floor", "leg_floor") +
       row("#f8f", "monster", "leg_monster") +
       row("#ff0", "boss", "leg_boss") +
       row("#fa0", "door", "leg_door") +
@@ -158,6 +159,119 @@ var MotaUI = (function () {
       row("#c8f", "portal", "leg_portal") +
       row("#f80", "toggle", "leg_toggle") +
       row("#8f8", "shop", "leg_shop");
+  }
+
+  function refreshChromeLabels() {
+    var a = document.getElementById("lab-speed");
+    var b = document.getElementById("lab-algo");
+    if (a) a.textContent = MotaI18n.t("lab_speed");
+    if (b) b.textContent = MotaI18n.t("lab_algo");
+    var ex = document.getElementById("exit-btn");
+    if (ex) ex.textContent = MotaI18n.t("exit_btn");
+    document.title = MotaI18n.t("page_title");
+    if (document.documentElement) {
+      document.documentElement.lang = MotaI18n.getLang() === "zh" ? "zh-CN" : "en";
+    }
+    var shopAside = document.getElementById("side-shop");
+    if (shopAside) shopAside.setAttribute("aria-label", MotaI18n.t("shop_title"));
+  }
+
+  function refreshShopButtonLabels() {
+    function pair(beforeId, afterId, lblKey) {
+      var a = document.getElementById(beforeId);
+      var b = document.getElementById(afterId);
+      if (a) a.textContent = MotaI18n.t(lblKey);
+      if (b) b.textContent = MotaI18n.t("shop_unit_gold");
+    }
+    pair("shop-lb-hp-l", "shop-lb-hp-r", "shop_lbl_hp");
+    pair("shop-lb-reset-l", "shop-lb-reset-r", "shop_lbl_reset");
+    pair("shop-lb-atk-l", "shop-lb-atk-r", "shop_lbl_atk");
+    pair("shop-lb-yellow-l", "shop-lb-yellow-r", "shop_lbl_yellow");
+    pair("shop-lb-def-l", "shop-lb-def-r", "shop_lbl_def");
+    pair("shop-lb-blue-l", "shop-lb-blue-r", "shop_lbl_blue");
+    pair("shop-lb-red-l", "shop-lb-red-r", "shop_lbl_red");
+  }
+
+  function buildCellInfoHtml(gs, mx, my) {
+    var c = gs.maze[my][mx];
+    var t = c.type;
+    var pos = MotaI18n.t("cell_pos", { x: String(mx), y: String(my) });
+    var title = MotaI18n.t("cell_title_unknown");
+    var body = [];
+
+    if (t === "monster" || t === "boss") {
+      title = t === "boss" ? MotaI18n.t("cell_title_boss") : MotaI18n.t("cell_title_monster");
+      body.push(t === "boss" ? MotaI18n.t("cell_boss_intro") : MotaI18n.t("cell_monster_intro"));
+      body.push(MotaI18n.t("cell_stat_hp") + ": " + c.hp);
+      body.push(MotaI18n.t("cell_stat_atk") + ": " + c.atk);
+      body.push(MotaI18n.t("cell_stat_def") + ": " + c.def);
+      body.push(MotaI18n.t("cell_stat_gold") + ": " + c.gold);
+    } else if (t === "door") {
+      title = MotaI18n.t("cell_title_door");
+      var col = MotaI18n.t("keycolor_" + (c.color || "yellow"));
+      body.push(MotaI18n.t("cell_door_desc", { color: col }));
+      if (c.requiresBoss) body.push(MotaI18n.t("cell_door_bosslock"));
+      body.push(MotaI18n.tip("door"));
+    } else if (t === "key") {
+      title = MotaI18n.t("cell_title_key");
+      body.push(MotaI18n.t("cell_key_desc", { color: MotaI18n.t("keycolor_" + (c.color || "yellow")) }));
+      body.push(MotaI18n.tip("key"));
+    } else if (t === "gold") {
+      title = MotaI18n.t("cell_title_gold");
+      body.push(MotaI18n.t("cell_gold_desc", { n: String(c.amount != null ? c.amount : 0) }));
+      body.push(MotaI18n.tip("gold"));
+    } else if (t === "stairs") {
+      title = MotaI18n.t("cell_title_stairs");
+      body.push(MotaI18n.t("cell_stairs_desc"));
+      body.push(MotaI18n.tip("stairs"));
+    } else if (t === "conveyor") {
+      title = MotaI18n.t("cell_title_conveyor");
+      if (c.convRandom) body.push(MotaI18n.t("cell_conv_random"));
+      else
+        body.push(
+          MotaI18n.t("cell_conv_fixed", {
+            dx: String(c.convDx != null ? c.convDx : 0),
+            dy: String(c.convDy != null ? c.convDy : 0)
+          })
+        );
+      body.push(MotaI18n.tip("conveyor"));
+    } else if (t === "portal") {
+      title = MotaI18n.t("cell_title_portal");
+      if (c.portalTarget && typeof c.portalTarget.x === "number") {
+        body.push(
+          MotaI18n.t("cell_portal_desc", {
+            x: String(c.portalTarget.x),
+            y: String(c.portalTarget.y)
+          })
+        );
+      } else body.push(MotaI18n.t("cell_portal_nopair"));
+      body.push(MotaI18n.tip("portal"));
+    } else {
+      title = MotaI18n.t("cell_title_floor");
+      body.push(MotaI18n.t("cell_floor_desc"));
+      if (c.platforms && c.platforms.length)
+        body.push(MotaI18n.t("cell_platforms_n", { n: String(c.platforms.length) }));
+      body.push(MotaI18n.tip("floor"));
+    }
+
+    return (
+      "<strong>" +
+      title +
+      "</strong><br><span style=\"opacity:0.85;font-size:11px\">" +
+      pos +
+      "</span><br>" +
+      body.join("<br>")
+    );
+  }
+
+  function showCellInspector(gs, mx, my) {
+    var el = document.getElementById("cell-info");
+    if (!el || !gs || !gs.maze[my] || !gs.maze[my][mx]) return;
+    el.innerHTML = buildCellInfoHtml(gs, mx, my);
+    el.style.display = "block";
+    setTimeout(function () {
+      el.style.display = "none";
+    }, 4200);
   }
 
   function syncWeightPanelVisibility() {
@@ -259,6 +373,8 @@ var MotaUI = (function () {
   }
 
   function refreshUiLang(gs) {
+    refreshChromeLabels();
+    refreshShopButtonLabels();
     var hint = document.getElementById("hint");
     if (hint) hint.textContent = MotaI18n.t("hint_main");
     var st = document.getElementById("side-shop-title");
@@ -282,6 +398,7 @@ var MotaUI = (function () {
     if (gs) {
       updatePauseButtonText(gs);
       updateStatus(gs);
+      refreshSideShop(gs);
     }
   }
 
@@ -477,6 +594,10 @@ var MotaUI = (function () {
     persistHighest: persistHighest,
     updatePauseButtonText: updatePauseButtonText,
     refreshAlgoOptionsText: refreshAlgoOptionsText,
-    refreshWeightPanelLabels: refreshWeightPanelLabels
+    refreshWeightPanelLabels: refreshWeightPanelLabels,
+    showCellInspector: showCellInspector,
+    buildCellInfoHtml: buildCellInfoHtml,
+    refreshChromeLabels: refreshChromeLabels,
+    refreshShopButtonLabels: refreshShopButtonLabels
   };
 })();

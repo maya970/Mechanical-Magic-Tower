@@ -199,11 +199,21 @@ var MotaNav = (function () {
     return bestMove;
   }
 
-  function pathToNextStep(gs, path) {
+  /**
+   * 寻路起点：始终为当前逻辑格 playerGx/playerGy（随传送/战斗/每步移动更新），
+   * 不是关卡出生点 startPos，也不是迷宫生成时的 carve 原点。
+   */
+  function planningStart(gs) {
+    return { x: gs.playerGx, y: gs.playerGy };
+  }
+
+  function pathToNextStep(sx, sy, path) {
     if (!path || path.length === 0) return null;
     var nx = path[0].x;
     var ny = path[0].y;
-    return { dx: nx - gs.playerGx, dy: ny - gs.playerGy };
+    var md = R.abs(nx - sx) + R.abs(ny - sy);
+    if (md !== 1) return null;
+    return { dx: nx - sx, dy: ny - sy };
   }
 
   function buildPathOverlay(gs, path) {
@@ -222,10 +232,11 @@ var MotaNav = (function () {
   function getNextMove(gs) {
     var goal = findStairs(gs);
     if (!goal) return null;
-    if (gs.playerGx === goal.x && gs.playerGy === goal.y) return null;
+    var origin = planningStart(gs);
+    var sx = origin.x;
+    var sy = origin.y;
+    if (sx === goal.x && sy === goal.y) return null;
 
-    var sx = gs.playerGx;
-    var sy = gs.playerGy;
     var algo = gs.navAlgorithm || "bfs";
     var path = null;
 
@@ -275,7 +286,11 @@ var MotaNav = (function () {
     }
 
     buildPathOverlay(gs, path);
-    return pathToNextStep(gs, path);
+    var step = pathToNextStep(sx, sy, path);
+    if (!step) {
+      gs.navPath = [];
+    }
+    return step;
   }
 
   function invalidate(gs) {
@@ -285,6 +300,7 @@ var MotaNav = (function () {
   return {
     getNextMove: getNextMove,
     invalidate: invalidate,
-    findStairs: findStairs
+    findStairs: findStairs,
+    planningStart: planningStart
   };
 })();

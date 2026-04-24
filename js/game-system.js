@@ -95,7 +95,7 @@ var MotaGame = (function () {
       var cy = (gy + 0.5) * cs;
       if (R.abs(ph.px - cx) > cs * 0.55 || R.abs(ph.py - cy) > cs * 0.55) continue;
       if (t.requiresBoss && !gs.bossDefeated) {
-        MotaUI.showAlert("必须先击败BOSS才能开启此门！");
+        MotaUI.showAlert(MotaI18n.t("msg_door_boss_first"));
         gs.doorInteractCooldown = 40;
         return;
       }
@@ -106,7 +106,7 @@ var MotaGame = (function () {
         gs.doorInteractCooldown = 30;
       } else {
         MotaUI.showAlert(
-          "需要" + (t.color === "yellow" ? "黄色" : t.color === "blue" ? "蓝色" : "红色") + "钥匙！"
+          MotaI18n.t("msg_need_key", { color: MotaI18n.t("keycolor_" + (t.color || "yellow")) })
         );
         gs.doorInteractCooldown = 40;
       }
@@ -128,12 +128,12 @@ var MotaGame = (function () {
 
     if (gs.currentFloor % 10 === 0) {
       if (!gs.bossDefeated) {
-        MotaUI.showAlert("必须先击败BOSS才能上楼！");
+        MotaUI.showAlert(MotaI18n.t("msg_boss_stairs"));
         gs.useStairsCooldown = 45;
         return;
       }
       if (gs.doorPos && gs.maze[gs.doorPos.y][gs.doorPos.x].type === "door") {
-        MotaUI.showAlert("必须先通过BOSS后的门才能上楼！");
+        MotaUI.showAlert(MotaI18n.t("msg_boss_door_stairs"));
         gs.useStairsCooldown = 45;
         return;
       }
@@ -161,7 +161,7 @@ var MotaGame = (function () {
       var dmgToMon = R.max(0, pl.atk - t.def);
       var dmgToPlayer = R.max(0, t.atk - pl.def);
       if (dmgToMon === 0) {
-        MotaUI.showAlert("你的攻击无法伤害BOSS！");
+        MotaUI.showAlert(MotaI18n.t("msg_cant_damage_boss"));
         return true;
       }
       var turns = R.ceil(t.hp / dmgToMon);
@@ -169,7 +169,7 @@ var MotaGame = (function () {
       if (pl.hp <= totalDmg) {
         gs.gameOver = true;
         MotaUI.persistHighest(gs);
-        MotaUI.showAlert("你被BOSS打败了！最高楼层：" + gs.highestFloor);
+        MotaUI.showAlert(MotaI18n.t("msg_die_boss") + gs.highestFloor);
         setTimeout(function () {
           window.location.reload();
         }, 2200);
@@ -189,7 +189,7 @@ var MotaGame = (function () {
     var dmg2 = R.max(0, pl.atk - t.def);
     var dmgP = R.max(0, t.atk - pl.def);
     if (dmg2 === 0) {
-      MotaUI.showAlert("你的攻击无法伤害怪物！");
+      MotaUI.showAlert(MotaI18n.t("msg_cant_damage_mon"));
       return true;
     }
     var turns2 = R.ceil(t.hp / dmg2);
@@ -197,7 +197,7 @@ var MotaGame = (function () {
     if (pl.hp <= totalDmg2) {
       gs.gameOver = true;
       MotaUI.persistHighest(gs);
-      MotaUI.showAlert("你被怪物打败了！最高楼层：" + gs.highestFloor);
+      MotaUI.showAlert(MotaI18n.t("msg_die_mon") + gs.highestFloor);
       setTimeout(function () {
         window.location.reload();
       }, 2200);

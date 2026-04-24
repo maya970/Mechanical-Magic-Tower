@@ -66,7 +66,6 @@ function setup() {
     gs.simAccumulator = 0;
     MotaUI.refreshUiLang(gs);
     MotaUI.syncWeightInputsFromGs(gs);
-    MotaUI.refreshSideShop(gs);
 
     var err = document.getElementById("load-err");
     if (err) err.style.display = "none";
@@ -115,8 +114,12 @@ function draw() {
       gs.simStepCount = (gs.simStepCount | 0) + 1;
       var mv = MotaNav.getNextMove(gs);
       if (mv && (mv.dx !== 0 || mv.dy !== 0)) {
-        MotaGridMove.movePlayerGrid(gs, mv.dx, mv.dy);
-        if (mv.dx !== 0) gs.phys.facing = mv.dx > 0 ? 1 : -1;
+        var moved = MotaGridMove.movePlayerGrid(gs, mv.dx, mv.dy);
+        if (!moved) {
+          MotaNav.invalidate(gs);
+        } else if (mv.dx !== 0) {
+          gs.phys.facing = mv.dx > 0 ? 1 : -1;
+        }
       }
     }
   }
@@ -146,26 +149,7 @@ function mousePressed() {
   var mx = floor(mouseX / cs);
   var my = floor(mouseY / cs);
   if (mx >= 0 && mx < G && my >= 0 && my < G) {
-    var cell = gs.maze[my][mx];
-    if (cell.type === "monster" || cell.type === "boss") {
-      var info = document.getElementById("monster-info");
-      if (info) {
-        info.innerHTML =
-          (cell.type === "boss" ? "BOSS" : "怪物") +
-          "信息<br>生命: " +
-          cell.hp +
-          "<br>攻击: " +
-          cell.atk +
-          "<br>防御: " +
-          cell.def +
-          "<br>金币: " +
-          cell.gold;
-        info.style.display = "block";
-        setTimeout(function () {
-          info.style.display = "none";
-        }, 2800);
-      }
-    }
+    MotaUI.showCellInspector(gs, mx, my);
   }
 }
 

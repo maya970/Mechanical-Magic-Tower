@@ -99,6 +99,10 @@ var MotaGridMove = (function () {
   /** 仅判断目标格是否可站立（不消耗步数上的门） */
   function canEnterCell(gs, nx, ny, forCombat) {
     var t = gs.maze[ny][nx];
+    if (t.type === "stairs" && gs.currentFloor % 10 === 0) {
+      if (!gs.bossDefeated) return false;
+      if (gs.doorPos && gs.maze[gs.doorPos.y][gs.doorPos.x].type === "door") return false;
+    }
     if (t.type === "door") {
       if (t.requiresBoss && !gs.bossDefeated) return false;
       if ((gs.player.keys[t.color] || 0) < 1) return false;
@@ -124,12 +128,12 @@ var MotaGridMove = (function () {
 
     if (gs.currentFloor % 10 === 0) {
       if (!gs.bossDefeated) {
-        MotaUI.showAlert("必须先击败BOSS才能上楼！");
+        MotaUI.showAlert(MotaI18n.t("msg_boss_stairs"));
         gs.useStairsCooldown = 45;
         return;
       }
       if (gs.doorPos && gs.maze[gs.doorPos.y][gs.doorPos.x].type === "door") {
-        MotaUI.showAlert("必须先通过BOSS后的门才能上楼！");
+        MotaUI.showAlert(MotaI18n.t("msg_boss_door_stairs"));
         gs.useStairsCooldown = 45;
         return;
       }

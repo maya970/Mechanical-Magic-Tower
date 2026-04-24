@@ -331,7 +331,7 @@ canvas {
   max-width: 94vw;
 }
 
-#monster-info {
+#cell-info {
   position: fixed;
   bottom: 150px;
   left: 50%;
@@ -343,9 +343,10 @@ canvas {
   font-size: 13px;
   z-index: 15;
   display: none;
-  text-align: center;
+  text-align: left;
   border-radius: 10px;
-  max-width: 88%;
+  max-width: min(360px, 92vw);
+  line-height: 1.45;
 }
 
 #alert-box {
